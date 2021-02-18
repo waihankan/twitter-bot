@@ -1,3 +1,5 @@
+Please read this before contributing to the code. Thanksss!
+
 1. fetch the data first and take action only after confirmation.
 
 2. retweet a fixed number of posts from the list of trusted users (may be .txt database).
