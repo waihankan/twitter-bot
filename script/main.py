@@ -126,10 +126,11 @@ def process_data(username, number_of_tweets):
             break
     print(tweet_data)
 
-    with open("../logfile/tweet_data.txt", "a") as file:
+    with open("tweet_data.txt", "a") as file:
         for tweet in tweet_data:
             file.write(tweet)
             file.write("\n\n")
+
 
 def main():
     window = tk.Tk()
