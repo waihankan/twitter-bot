@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 import sys
 import tkinter as tk
 import tweepy
 import re
 try:
     import config
-    
+
     auth = tweepy.OAuthHandler(config.api_key, config.api_secret)
     auth.set_access_token(config.access_token, config.token_secret)
     api = tweepy.API(auth, wait_on_rate_limit=True,
@@ -146,7 +145,7 @@ def main():
     img = tk.PhotoImage(file = "../image/logo.png")
     img = img.zoom(25)
     img = img.subsample(51)
-    logo = tk.Label(window, image=img, borderwidth=0, highlightthickness=0) 
+    logo = tk.Label(window, image=img, borderwidth=0, highlightthickness=0)
     logo.place(x=0, y=50)
 
     user_label = tk.Label(window, text="Username", bg="lavender")
