@@ -1,54 +1,78 @@
-import config
+#!/usr/bin/env python3
 import tweepy
 import sys
 import re
+import config
 
+def main():
+    try:
+        # setup twitter API
+        auth = tweepy.OAuthHandler(config.api_key, config.api_secret)
+        auth.set_access_token(config.access_token, config.token_secret)
+        api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        admin = api.me()
 
-# setup twitter API
-auth = tweepy.OAuthHandler(config.api_key, config.api_secret)
-auth.set_access_token(config.access_token, config.token_secret)
-api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        #url = input("\nWelcome to Twitter Bot CML!\n---------------------------\nURL: ")
 
-admin = api.me()
+        # print("Link: " + url)
 
-url = input("\nWelcome to Twitter Bot CML!\n---------------------------\nURL: ")
+        print("\nWelcome to Twitter Bot CML!\n---------------------------\n")
 
-# print("Link: " + url)
+        query = read_file('query.txt')
+        for i in range(len(query)):
+                
+            pattern = r"https:\/\/twitter\.com\/(.+)\/status\/(\d*)"
+            result = re.findall(pattern, query[i])
 
-pattern = r"https:\/\/twitter\.com\/(.+)\/status\/(\d*)"
-result = re.findall(pattern, url)
+            user_id = result[0][0]
+            tweet_id = result[0][1]
+            print("Tweet author: {user_id}".format(user_id=user_id))
+            api = tweepy.API(auth)
 
-user_id = result[0][0]
-tweet_id = result[0][1]
-# print(user_id, tweet_id)
+            tweet = api.get_status(tweet_id)
 
-api = tweepy.API(auth)
+            if not tweet.favorited:
+                tweet.favorite()
+                print("-> favorite tweet")
 
-tweet = api.get_status(tweet_id)
+            else:
+                print("-> tweet already favorited")
 
-if not tweet.favorited:
-    tweet.favorite()
-    print("-> favorite tweet")
+            if not tweet.retweeted:
+                tweet.retweet()
+                print("-> retweet tweet")
 
-else:
-    print("-> tweet already favorited")
+            else:
+                print("-> tweet already retweeted")
 
-if not tweet.retweeted:
-    tweet.retweet()
-    print("-> retweet tweet")
+            # print(admin.screen_name)
+            relationships =  api.lookup_friendships(screen_names=[user_id])
 
-else:
-    print("-> tweet already retweeted")
+            for relationship in relationships:
+                if not relationship.is_following:
+                    api.create_friendship(user_id)
+                    print("-> follow the tweet user")
+                    print("\n")
+                else:
+                    print("-> already followed the tweet user")
 
-# print(admin.screen_name)
-    
-relationships =  api.lookup_friendships(user_ids=(admin.id, user_id))
+        print("Done! Existing...")
 
-for relationship in relationships: 
-    if not relationship.is_following:
-        api.create_friendship(user_id)
-        print("-> follow the tweet user")
-    else:
-        print("-> already followed the user!")
-print("Done!")
-sys.exit(0)
+    except KeyboardInterrupt:
+        print("\nAbort")
+        sys.exit(0)
+
+def read_file(filename):
+    dict_ = {}
+    id_ = 0
+    pattern = r"^https:\/\/twitter\.com\/.+\/status\/\d*"
+    with open(filename) as file:
+        for line in file:
+            if re.match(pattern, line):
+               (key, val) = id_, line
+               dict_[key] = val
+               id_ += 1
+        return dict_
+
+if __name__ == '__main__':
+    main()
