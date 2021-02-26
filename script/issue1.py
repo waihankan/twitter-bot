@@ -11,11 +11,6 @@ def main():
         auth.set_access_token(config.access_token, config.token_secret)
         api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         admin = api.me()
-
-        #url = input("\nWelcome to Twitter Bot CML!\n---------------------------\nURL: ")
-
-        # print("Link: " + url)
-
         print("\nWelcome to Twitter Bot CML!\n---------------------------\n")
 
         query = read_file('query.txt')
@@ -55,12 +50,18 @@ def main():
                     print("\n")
                 else:
                     print("-> already followed the tweet user")
+            
+            api.update_status(status="a comment", in_reply_to_status_id=tweet_id, auto_populate_reply_metadata=True) 
+            print("-> reply to the author's tweet")
 
         print("Done! Existing...")
 
     except KeyboardInterrupt:
         print("\nAbort")
         sys.exit(0)
+    
+    except tweepy.error as e:
+        print("\nError: {e}".format(e=e))
 
 def read_file(filename):
     dict_ = {}
