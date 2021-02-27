@@ -120,14 +120,14 @@ def process_data(username, number_of_tweets):
             if re.match(pattern, tweet.text) is not None:
                 print("Original Author: "+re.match(pattern, tweet.text).group(1))
                 if not tweet.favorited:
-                    #tweet.favorite()
+                    tweet.favorite()
                     print("Like tweet")
 
                 else:
                     print("Post already liked")
 
                 if not tweet.retweeted:
-                    #tweet.retweet()
+                    tweet.retweet()
                     print("Retweet")
 
                 else:
