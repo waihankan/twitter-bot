@@ -129,7 +129,9 @@ Here is how to use the code as of latest source code.
 
 ## Demo Images
 
---demo_images###
+<img align="center" src="image/API_config.png" width = 370 hspace=50> <img align="center" src="image/GUI.png" width=370>
+
+
 
 
 <!-- ROADMAP -->
