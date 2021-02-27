@@ -2,6 +2,9 @@ import sys
 import tkinter as tk
 import tweepy
 import re
+import os
+
+
 try:
     import config
 
@@ -18,6 +21,21 @@ except ImportError:
             file.write('api_secret="'+ api_secret+'"\n')
             file.write('access_token="' + access_token+'"\n')
             file.write('token_secret="' + token_secret+'"\n')
+
+            auth = tweepy.OAuthHandler(api_key, api_secret)
+            auth.set_access_token(access_token, token_secret)
+            api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+            
+            if api.verify_credentials():
+            	print("Valid credentials: Please rerun the software!")
+            	
+
+            else:
+            	os.remove("config.py")
+            	print("Fatal: Invalid credentials. Aborting ...")
+            	# print("Remove the invalid coinfig file")
+
+
             sys.exit(0)
 
 
@@ -102,14 +120,14 @@ def process_data(username, number_of_tweets):
             if re.match(pattern, tweet.text) is not None:
                 print("Original Author: "+re.match(pattern, tweet.text).group(1))
                 if not tweet.favorited:
-                    tweet.favorite()
+                    #tweet.favorite()
                     print("Like tweet")
 
                 else:
                     print("Post already liked")
 
                 if not tweet.retweeted:
-                    tweet.retweet()
+                    #tweet.retweet()
                     print("Retweet")
 
                 else:
