@@ -10,7 +10,7 @@ class Window(tk.Frame):
        # Main Window
        self.master = master
        self.master.title("Twitter Bot")
-       # self.master.resizable(width=False, height=False)
+       self.master.resizable(width=False, height=False)
        self.master.geometry("619x373")
        self.master.configure(bg="white")
 
@@ -39,17 +39,18 @@ class Window(tk.Frame):
        self.status.grid(row=1, sticky=tk.NW, padx=10)
 
        # Text Box
-       self.text_box = tk.Text(self.display, width=50, height=10, fg="white", bg="#545454")
+       self.text_box = tk.Text(self.display, width=50, height=10, fg="white", bg="#545454", highlightcolor="#ce8cf5")
        self.text_box.grid(columnspan=4, row=2, padx=10, pady=10)
 
        # Radios
-       var = tk.IntVar()
+       self.var = tk.IntVar()
+       self.var.set(2)
        self.retweet_only = tk.Radiobutton(self.display, bg="#252626", borderwidth=0, highlightbackground="#252626", activebackground="#8c8c8c",
-        text="Retweet Except Quote Tweet", fg="#ce8cf5", variable=var, value=1)
+        text="Retweet Except Quote Tweet", fg="#ce8cf5", variable=self.var, value=1, command=self.ShowChoice)
        self.retweet_only.grid(row=3, column=0, sticky=tk.W)
 
        self.all = tk.Radiobutton(self.display, bg="#252626", borderwidth=0, highlightbackground="#252626", activebackground="#8c8c8c",
-        text="Retweet Everything", fg="#ce8cf5", variable=var, value=2)
+        text="Retweet Everything", fg="#ce8cf5", variable=self.var, value=2, command=self.ShowChoice)
        self.all.grid(row=4, column=0, sticky=tk.W)
 
        # Start Button
@@ -70,22 +71,28 @@ class Window(tk.Frame):
        self.user_frame = tk.Frame(self.auth_frame, bg="#252626")
        self.user_frame.grid(row=1, column=0)
 
-       tk.Label(self.user_frame, text="Username: ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=3)
+       # Username
+       tk.Label(self.user_frame, text="Username: ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=2)
        self.user_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
        self.user_entry.pack()
 
-       tk.Label(self.user_frame, text="Tweets No.: ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=3)
-       self.user_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
-       self.user_entry.pack()
+       tk.Label(self.user_frame, text="Tweets No.: ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=2)
+       self.tweets_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
+       self.tweets_entry.pack()
 
-       tk.Label(self.user_frame, text="HashTag(Optional): ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=3)
-       self.user_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
-       self.user_entry.pack()
+       tk.Label(self.user_frame, text="HashTag(Optional): ", bg="#252626", fg="#ce8cf5").pack(padx=10, pady=5)
+       self.hashtag_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
+       self.hashtag_entry.pack(pady=2)
 
-       tk.Label(self.user_frame, bg="#252626", width=20, height=6).pack()
+       checkbox_value = tk.IntVar()
 
+       tk.Checkbutton(self.user_frame, text="Make a Quote Tweet", variable=checkbox_value, onvalue=1, offvalue=0, bg="#252626", fg="#ce8cf5", highlightbackground="#252626", activebackground="#8c8c8c").pack(pady=7)
 
+       tk.Text(self.user_frame,width=20, height=3, bg="#545454", highlightcolor="#ce8cf5").pack(ipady=2)
+      
 
+    def ShowChoice(self):
+      print(self.var.get())
 
 
 def main():
@@ -94,8 +101,8 @@ def main():
     img = img.zoom(25)
     img = img.subsample(51)
     window = Window(root, img)
-
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
