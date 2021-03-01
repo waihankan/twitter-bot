@@ -2,8 +2,9 @@
 
 import tkinter as tk
 from tkinter import ttk
-from twitter  import Twitter
+from twitter import Twitter
 import config
+
 
 class Window():
   def __init__(self, master, img):
@@ -38,7 +39,7 @@ class Window():
 
     # Status
     self.status_var = tk.StringVar()
-    self.status_var.set("Status: Running")
+    self.status_var.set("Status: Ready")
     self.status = tk.Label(self.display, textvariable=self.status_var, fg="#ce8cf5",
     bg="#252626", font="Arial 12 bold", width=30, anchor=tk.NW)
     self.status.grid(row=1, sticky=tk.NW, padx=10)
@@ -83,15 +84,6 @@ class Window():
                               value=2, 
                               command=self.ShowChoice)
     self.all.grid(row=4, column=0, sticky=tk.W)
-
-
-    # Start Button
-    self.start_b = tk.Button(self.display,
-                            width=7, 
-                            bg="#ce8cf5",
-                            fg="white", 
-                            text="Start")
-    self.start_b.grid(row=5, column=3, padx=13, pady=15)
 
 
     # Quit Button
@@ -160,6 +152,17 @@ class Window():
     # Retweet Quote TextBox
     tk.Text(self.user_frame,width=20, height=3, bg="#545454", highlightcolor="#ce8cf5").pack(ipady=2)
 
+    # Start Button
+    self.start_var = tk.StringVar()
+    self.start_var.set('Start')
+    self.start_b = tk.Button(self.display,
+                            width=7, 
+                            bg="#ce8cf5",
+                            fg="white", 
+                            textvariable=self.start_var,
+                            command=self.StartCommand)
+    self.start_b.grid(row=5, column=3, padx=13, pady=15)
+
 ###### END OF SELF ATTRIBUTES #######
 
   def ShowChoice(self):
@@ -168,14 +171,17 @@ class Window():
   def ShowCheckbox(self):
     print(self.checkbox_value.get())
 
+    
+  def StartCommand(self):
+    twitter = Twitter(config, 10, "LengZom", True)
 
+    
 def main():
   root = tk.Tk()
   img = tk.PhotoImage(file = "../image/logo.png")
   img = img.zoom(25)
   img = img.subsample(51)
   window = Window(root, img)
-  twitter = Twitter(config, 10, "LengZom", True)
   root.mainloop()
 
 
