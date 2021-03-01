@@ -2,6 +2,8 @@
 
 import tkinter as tk
 from tkinter import ttk
+from twitter  import Twitter
+import config
 
 class Window():
   def __init__(self, master, img):
@@ -173,6 +175,7 @@ def main():
   img = img.zoom(25)
   img = img.subsample(51)
   window = Window(root, img)
+  twitter = Twitter(config, 10, "LengZom", True)
   root.mainloop()
 
 
