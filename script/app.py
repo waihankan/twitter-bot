@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from twitter import Twitter
 import config
+import emoji
 
 
 class Window():
@@ -15,6 +16,7 @@ class Window():
     self.master.resizable(width=False, height=False)
     self.master.geometry("619x373")
     self.master.configure(bg="white")
+    self.time = 0
 
 
     # Left Panel
@@ -56,8 +58,8 @@ class Window():
 
 
     # Radio(1)
-    self.var = tk.IntVar()
-    self.var.set(2)
+    self.radio_var = tk.IntVar()
+    self.radio_var.set(1)
 
     self.retweet_only = tk.Radiobutton(self.display,
                                        bg="#252626",
@@ -66,7 +68,7 @@ class Window():
                                        activebackground="#8c8c8c",
                                        text="Retweet Except Quote Tweet", 
                                        fg="#ce8cf5", 
-                                       variable=self.var, 
+                                       variable=self.radio_var, 
                                        value=1, 
                                        command=self.ShowChoice)
     self.retweet_only.grid(row=3, column=0, sticky=tk.W)
@@ -80,8 +82,8 @@ class Window():
                               activebackground="#8c8c8c",
                               text="Retweet Everything", 
                               fg="#ce8cf5", 
-                              variable=self.var, 
-                              value=2, 
+                              variable=self.radio_var, 
+                              value=0, 
                               command=self.ShowChoice)
     self.all.grid(row=4, column=0, sticky=tk.W)
 
@@ -91,7 +93,8 @@ class Window():
                             width=7, 
                             bg="#ce8cf5",
                             fg="white", 
-                            text="Quit")
+                            text="Quit",
+                            command=self.master.destroy)
     self.quit_b.grid(row=5, column=0, padx=13, pady=15, sticky=tk.W)
 
 
@@ -154,7 +157,7 @@ class Window():
 
     # Start Button
     self.start_var = tk.StringVar()
-    self.start_var.set('Start')
+    self.start_var.set('Verify')
     self.start_b = tk.Button(self.display,
                             width=7, 
                             bg="#ce8cf5",
@@ -166,14 +169,36 @@ class Window():
 ###### END OF SELF ATTRIBUTES #######
 
   def ShowChoice(self):
-    print(self.var.get())
+    print(self.radio_var.get())
 
   def ShowCheckbox(self):
     print(self.checkbox_value.get())
 
     
   def StartCommand(self):
-    twitter = Twitter(config, 10, "LengZom", True)
+    print(self.tweets_entry.get(), self.user_entry.get())
+
+    if self.time == 0:
+      self.status_var.set("Status: Tweeting. Please Wait")
+      self.start_var.set("Start")
+      self.time += 1
+      self.master.mainloop()
+
+    else:
+      self.time = 0
+      twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
+              , self.radio_var.get())
+      if twitter.checkAuth():
+        twitter.process_tweet()
+        content=twitter.get_log()
+
+        for i in range(len(content)):
+          self.text_box.insert(tk.END, content[i] + "...\n")
+          self.text_box.tag_configure('left', justify='left')
+          self.text_box.tag_add('left', 1.0, 'end')
+
+      self.status_var.set("Status: Ready")
+      self.start_var.set("Verify")
 
     
 def main():
