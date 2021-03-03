@@ -38,14 +38,14 @@ class Twitter():
 
     def _like_and_retweet(self, tweet):
         if not tweet.favorited:
-            #tweet.favorite()
+            tweet.favorite()
             self.like_counter += 1
             print("like tweet")
         else:
             print("already liked")
 
         if not tweet.retweeted:
-            # tweet.retweet().
+            tweet.retweet()
             content = "* " +tweet.text[:45].replace('\n', ' ')
             content = content.replace('RT @', '')
             self.log.append(content)
