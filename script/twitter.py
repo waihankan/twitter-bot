@@ -7,7 +7,8 @@ import config
 import emoji
 
 class Twitter():
-    def __init__(self, config, tweets_num, username, retweet_only):
+    def __init__(self, config, tweets_num, username, retweet_only, hashtag):
+        self.hashtag = hashtag
         self.config = config
         self.like_counter = 0
         self.retweet_counter = 0
@@ -31,10 +32,23 @@ class Twitter():
 
     def _is_retweet(self, tweet):
         pattern=r"^RT @(.*):"
-        if re.match(pattern, tweet.text) is not None:
+        if re.match(pattern, tweet.full_text) is not None:
             return True
         else:
             return False
+
+
+    def _check_hashtag(self, text):
+        pattern = ".*" + self.hashtag + ".*"
+        if self.hashtag == '':
+            return True
+
+        elif re.match(pattern, text.replace('\n', '').replace('\r', '')) is not None:
+            return True
+        
+        else:
+            return False
+
 
     def _like_and_retweet(self, tweet):
         if not tweet.favorited:
@@ -46,29 +60,31 @@ class Twitter():
 
         if not tweet.retweeted:
             tweet.retweet()
-            content = "* " +tweet.text[:45].replace('\n', ' ')
+            content = "* " +tweet.full_text[:45].replace('\n', ' ')
             content = content.replace('RT @', '')
             self.log.append(content)
             self.retweet_counter += 1
             print("retweet")
         else:
-            content = "# " +tweet.text[4:46].replace('\n', ' ')
+            content = "# " +tweet.full_text[4:46].replace('\n', ' ')
             self.log.append(content)
             print("retweeted post")
 
 
     def process_tweet(self):
         self.user = self.api.get_user(self.username)
-        self.timeline = self.api.user_timeline(self.username, count=self.tweets_num)
+        self.timeline = self.api.user_timeline(self.username, count=self.tweets_num
+                ,tweet_mode="extended")
         self.sname = self.user.screen_name
 
         for tweet in self.timeline:
             if self.retweet_only:
-                if self._is_retweet(tweet):
+                if self._is_retweet(tweet) and self._check_hastag(tweet.full_text):
                     self._like_and_retweet(tweet)
 
             else:
-                self._like_and_retweet(tweet)
+                if self._check_hashtag(tweet.full_text):
+                    self._like_and_retweet(tweet)
 
         print("All good. Like {like} tweets; Retweet {retweet} tweets."
         	.format(like=self.like_counter, retweet=self.retweet_counter))

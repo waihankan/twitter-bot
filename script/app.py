@@ -70,7 +70,7 @@ class Window():
                                        fg="#ce8cf5", 
                                        variable=self.radio_var, 
                                        value=1, 
-                                       command=self.ShowChoice)
+                                       )
     self.retweet_only.grid(row=3, column=0, sticky=tk.W)
 
 
@@ -84,7 +84,7 @@ class Window():
                               fg="#ce8cf5", 
                               variable=self.radio_var, 
                               value=0, 
-                              command=self.ShowChoice)
+                              )
     self.all.grid(row=4, column=0, sticky=tk.W)
 
 
@@ -130,7 +130,7 @@ class Window():
 
     # Hashtag
     tk.Label(self.user_frame, 
-             text="HashTag(Optional): ", 
+             text="Specific Hashtag: ", 
              bg="#252626", 
              fg="#ce8cf5").pack(padx=10, pady=5)
     self.hashtag_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
@@ -149,7 +149,7 @@ class Window():
                    fg="#ce8cf5", 
                    highlightbackground="#252626", 
                    activebackground="#8c8c8c", 
-                   command=self.ShowCheckbox).pack(pady=7)
+                   ).pack(pady=7)
 
 
     # Retweet Quote TextBox
@@ -167,16 +167,9 @@ class Window():
     self.start_b.grid(row=5, column=3, padx=13, pady=15)
 
 ###### END OF SELF ATTRIBUTES #######
-
-  def ShowChoice(self):
-    print(self.radio_var.get())
-
-  def ShowCheckbox(self):
-    print(self.checkbox_value.get())
-
     
   def StartCommand(self):
-    print(self.tweets_entry.get(), self.user_entry.get())
+    print("Checking {num} of tweets from user {name}".format(num=self.tweets_entry.get(), name=self.user_entry.get()))
 
     if self.time == 0:
       self.status_var.set("Status: Tweeting. Please Wait")
@@ -187,7 +180,7 @@ class Window():
     else:
       self.time = 0
       twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
-              , self.radio_var.get())
+              , self.radio_var.get(), self.hashtag_entry.get())
       if twitter.checkAuth():
         twitter.process_tweet()
         content=twitter.get_log()
