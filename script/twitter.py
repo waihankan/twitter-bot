@@ -47,6 +47,7 @@ class Twitter():
             return True
         
         else:
+            self.log.append("? Hashtag not match")
             return False
 
 

@@ -16,8 +16,6 @@ class Window():
     self.master.resizable(width=False, height=False)
     self.master.geometry("619x373")
     self.master.configure(bg="white")
-    self.time = 0
-
 
     # Left Panel
     self.auth_frame = tk.Frame(self.master, width=250, height=400, bg="#252626")
@@ -41,7 +39,7 @@ class Window():
 
     # Status
     self.status_var = tk.StringVar()
-    self.status_var.set("Status: Ready")
+    self.status_var.set("Status: Ready to start")
     self.status = tk.Label(self.display, textvariable=self.status_var, fg="#ce8cf5",
     bg="#252626", font="Arial 12 bold", width=30, anchor=tk.NW)
     self.status.grid(row=1, sticky=tk.NW, padx=10)
@@ -158,47 +156,47 @@ class Window():
 
     # Start Button
     self.start_var = tk.StringVar()
-    self.start_var.set('Verify')
+    self.start_var.set('Start')
     self.start_b = tk.Button(self.display,
                             width=7, 
                             bg="#ce8cf5",
                             fg="white", 
                             textvariable=self.start_var,
                             command=self.StartCommand,
-                            state=tk.ACTIVE)
+                            state=tk.NORMAL)
+
     self.start_b.grid(row=5, column=3, padx=13, pady=15)
 
 ###### END OF SELF ATTRIBUTES #######
     
   def StartCommand(self):
-    if self.time == 0:
-      self.status_var.set("Status: Tweeting. Please Wait")
-      self.start_var.set("Start")
-      self.time += 1
-      self.text_box.delete('1.0', tk.END)
-      self.text_box.insert(tk.END, "Checking {num} tweets from user {name}.\nPress <Start> to continue.\n\n".format(num=self.tweets_entry.get().replace(' ', ''), name=self.user_entry.get()))
-      self.text_box.tag_configure('left', justify='left')
-      self.text_box.tag_add('left', 1.0, 'end')
-      self.master.mainloop()
+    self.text_box.delete('1.0', tk.END)
+    self.text_box.insert(tk.END, "Checking {num} tweets from user {name}.\n\n".format(num=self.tweets_entry.get().replace(' ', ''), name=self.user_entry.get()))
+    self.text_box.tag_configure('left', justify='left')
+    self.text_box.tag_add('left', 1.0, 'end')
 
-    else:
-      self.time = 0
-      self.start_b.config(state='disabled')
-      self.start_b.update()
-      twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
-              , self.radio_var.get(), self.hashtag_entry.get())
-      if twitter.checkAuth():
-        twitter.process_tweet()
-        content=twitter.get_log()
+    self.start_var.set("Loading")
+    self.start_b.config(state='disabled', bg="#707070", fg="#D3D3D3")
+    self.start_b.update()
+    twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
+            , self.radio_var.get(), self.hashtag_entry.get())
+    self.status_var.set("Status: Authenticating User")
+    self.status.update()
 
-        for i in range(len(content)):
-          self.text_box.insert(tk.END, content[i] + "\n")
-          self.text_box.tag_configure('left', justify='left')
-          self.text_box.tag_add('left', 1.0, 'end')
+    if twitter.checkAuth():
+      self.status_var.set("Status: Retweeting")
+      self.status.update()
+      twitter.process_tweet()
+      content=twitter.get_log()
 
-      self.status_var.set("Status: Ready")
-      self.start_var.set("Verify")
-      self.start_b.config(state='active')
+      for i in range(len(content)):
+        self.text_box.insert(tk.END, content[i] + "\n")
+        self.text_box.tag_configure('left', justify='left')
+        self.text_box.tag_add('left', 1.0, 'end')
+
+    self.status_var.set("Status: Ready to start")
+    self.start_var.set("Start")
+    self.start_b.config(state='normal', bg="#ce8cf5", fg='white')
 
     
 def main():
