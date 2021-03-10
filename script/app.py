@@ -117,6 +117,7 @@ class Window():
             fg="#ce8cf5").pack(padx=10, pady=2)
     self.user_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
     self.user_entry.pack()
+    self.user_entry.focus_set()
 
 
     # Tweets Entry
@@ -163,22 +164,27 @@ class Window():
                             bg="#ce8cf5",
                             fg="white", 
                             textvariable=self.start_var,
-                            command=self.StartCommand)
+                            command=self.StartCommand,
+                            state=tk.ACTIVE)
     self.start_b.grid(row=5, column=3, padx=13, pady=15)
 
 ###### END OF SELF ATTRIBUTES #######
     
   def StartCommand(self):
-    print("Checking {num} of tweets from user {name}".format(num=self.tweets_entry.get(), name=self.user_entry.get()))
-
     if self.time == 0:
       self.status_var.set("Status: Tweeting. Please Wait")
       self.start_var.set("Start")
       self.time += 1
+      self.text_box.delete('1.0', tk.END)
+      self.text_box.insert(tk.END, "Checking {num} tweets from user {name}.\nPress <Start> to continue.\n\n".format(num=self.tweets_entry.get().replace(' ', ''), name=self.user_entry.get()))
+      self.text_box.tag_configure('left', justify='left')
+      self.text_box.tag_add('left', 1.0, 'end')
       self.master.mainloop()
 
     else:
       self.time = 0
+      self.start_b.config(state='disabled')
+      self.start_b.update()
       twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
               , self.radio_var.get(), self.hashtag_entry.get())
       if twitter.checkAuth():
@@ -186,12 +192,13 @@ class Window():
         content=twitter.get_log()
 
         for i in range(len(content)):
-          self.text_box.insert(tk.END, content[i] + "...\n")
+          self.text_box.insert(tk.END, content[i] + "\n")
           self.text_box.tag_configure('left', justify='left')
           self.text_box.tag_add('left', 1.0, 'end')
 
       self.status_var.set("Status: Ready")
       self.start_var.set("Verify")
+      self.start_b.config(state='active')
 
     
 def main():
