@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import tweepy
 import re
 import os
@@ -7,7 +8,8 @@ import config
 import emoji
 
 class Twitter():
-    def __init__(self, config, tweets_num, username, retweet_only, hashtag):
+    def __init__(self, config, tweets_num, username, retweet_only, hashtag, status):
+        self.status = status
         self.hashtag = hashtag
         self.config = config
         self.like_counter = 0
@@ -101,11 +103,20 @@ class Twitter():
         except tweepy.TweepError as e:
             self.log.append(e.reason)
 
+
+    def make_tweet(self):
+        try:
+            status = self.status
+            self.api.update_status(status)
+            self.log.append("Successfully tweeted: " + status)
+
+        except tweepy.TweepError as e:
+            self.log.append(e.reason)
+
+
     def get_log(self):
     	return self.log
 
+
     def user_screen(self):
     	return self.sname
-
-
-
