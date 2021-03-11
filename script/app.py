@@ -8,7 +8,7 @@ import emoji
 
 
 class Window():
-  def __init__(self, master, img):
+  def __init__(self, master, logo, power):
 
     # Main Window
     self.master = master
@@ -16,7 +16,7 @@ class Window():
     self.master.resizable(width=False, height=False)
     self.master.geometry("619x373")
     self.master.configure(bg="white")
-
+    
     # Left Panel
     self.auth_frame = tk.Frame(self.master, width=250, height=400, bg="#252626")
     self.auth_frame.grid(row=0, column=0)
@@ -98,7 +98,7 @@ class Window():
 
     # Logo Picture
     self.logo = tk.Label(self.auth_frame, 
-                         image=img, 
+                         image=logo, 
                          borderwidth=0,
                          highlightthickness=0, 
                          bg="#252626")
@@ -158,14 +158,16 @@ class Window():
     self.start_var = tk.StringVar()
     self.start_var.set('Start')
     self.start_b = tk.Button(self.display,
-                            width=7, 
+                            width=50, 
                             bg="#ce8cf5",
-                            fg="white", 
+                            fg="white",
+                            image=power,
+                            compound=tk.LEFT,
                             textvariable=self.start_var,
                             command=self.StartCommand,
                             state=tk.NORMAL)
 
-    self.start_b.grid(row=5, column=3, padx=13, pady=15)
+    self.start_b.grid(row=5, column=3, padx=0, pady=15)
 
 ###### END OF SELF ATTRIBUTES #######
     
@@ -201,10 +203,17 @@ class Window():
     
 def main():
   root = tk.Tk()
-  img = tk.PhotoImage(file = "../image/logo.png")
-  img = img.zoom(25)
-  img = img.subsample(51)
-  window = Window(root, img)
+  root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='../image/tweet.png'))
+
+  # load twitter logo
+  logo = tk.PhotoImage(file = "../image/logo.png")
+  logo = logo.zoom(25)
+  logo = logo.subsample(51)
+
+  # load power button logo
+  power = tk.PhotoImage(file = "../image/start_icon.png")
+
+  window = Window(root, logo, power)
   root.mainloop()
 
 
