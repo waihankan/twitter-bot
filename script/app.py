@@ -35,7 +35,7 @@ class api_window():
     self.master = master
     self.master.title("Twitter API Configuration")
     self.master.geometry("450x280")
-    # self.master.resizable(width=False, height=False)
+    self.master.resizable(width=False, height=False)
     self.master.configure(bg="#252626")
 
     self.logo = tk.PhotoImage(file = "../image/settings.png")
