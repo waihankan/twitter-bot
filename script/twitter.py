@@ -4,8 +4,7 @@ import tweepy
 import re
 import os
 import sys
-import config
-import emoji
+
 
 class Twitter():
     def __init__(self, config, tweets_num, username, retweet_only, hashtag, status):

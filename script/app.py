@@ -3,11 +3,104 @@
 import tkinter as tk
 from tkinter import ttk
 from twitter import Twitter
-import config
+import sys
+import os
+import tweepy
 
 
-class Window():
-  def __init__(self, master, logo):
+def login(api_key, api_secret, access_token, token_secret):
+  with open("config.py", "w") as file:
+          file.write('api_key="' + api_key+'"\n')
+          file.write('api_secret="'+ api_secret+'"\n')
+          file.write('access_token="' + access_token+'"\n')
+          file.write('token_secret="' + token_secret+'"\n')
+          
+          auth = tweepy.OAuthHandler(api_key, api_secret)
+          auth.set_access_token(access_token, token_secret)
+          api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+          try:
+              if api.verify_credentials():
+                print("ok")
+                sys.exit(0)
+              else:
+                os.remove("config.py")
+                
+          except tweepy.TweepError as e:
+              print(e)
+              os.remove("config.py")        
+              
+
+class api_window():
+  def __init__(self, master):
+    self.master = master
+    self.master.title("Twitter API Configuration")
+    self.master.geometry("450x280")
+    # self.master.resizable(width=False, height=False)
+    self.master.configure(bg="#252626")
+
+    self.logo = tk.PhotoImage(file = "../image/settings.png")
+    self.logo_label = tk.Label(self.master, image=self.logo, bg = "#252626")
+    self.logo_label.pack(fill=tk.X, pady=(10, 10))
+
+    self.pane1 = tk.Frame(self.master, bg="#252626")
+    self.pane1.pack(fill=tk.X, side=tk.TOP, anchor=tk.NW, padx=(20, 0), pady=(0, 0))
+
+    self.api_key_label = tk.Label(self.pane1, text = "api_key", fg = "#e8d4a0",
+            bg="#252626", font = "Times 14 bold" )
+    self.api_key_label.pack(side=tk.LEFT, padx=(10, 0))
+    self.api_key_entry = tk.Entry(self.pane1, width=35, bd=2,
+            highlightcolor="#1960bd", relief=tk.FLAT, fg="white", bg="#545454")
+    self.api_key_entry.pack(side=tk.LEFT, padx=(75, 0))
+    self.api_key_entry.focus_set()
+
+    self.pane2 = tk.Frame(self.master, bg="#252626")
+    self.pane2.pack(fill=tk.X, side=tk.TOP, anchor=tk.NW, padx=(20, 0), pady=(5, 0))
+
+    self.api_s_label = tk.Label(self.pane2, text = "api_secret", fg = "#e8d4a0",
+            bg="#252626", font = "Times 14 bold" )
+    self.api_s_label.pack(side=tk.LEFT, padx=(10, 0))
+    self.api_s_entry = tk.Entry(self.pane2, width=35, bd=2,
+            highlightcolor="#1960bd", relief=tk.FLAT, fg="white", bg="#545454")
+    self.api_s_entry.pack(side=tk.LEFT, padx=(58, 0))
+
+    self.pane3 = tk.Frame(self.master, bg="#252626")
+    self.pane3.pack(fill=tk.X, side=tk.TOP, anchor=tk.NW, padx=(20, 0), pady=(5, 0))
+
+    self.access_token_label = tk.Label(self.pane3, text = "access_token", fg = "#e8d4a0",
+            bg="#252626", font = "Times 14 bold" )
+    self.access_token_label.pack(side=tk.LEFT, padx=(10, 0))
+    self.access_token_entry = tk.Entry(self.pane3, width=35, bd=2,
+            highlightcolor="#1960bd", relief=tk.FLAT, fg="white", bg="#545454")
+    self.access_token_entry.pack(side=tk.LEFT, padx=(38, 0))
+
+    self.pane4 = tk.Frame(self.master, bg="#252626")
+    self.pane4.pack(fill=tk.X, side=tk.TOP, anchor=tk.NW, padx=(20, 0), pady=(5, 0))
+
+    self.token_label = tk.Label(self.pane4, text = "token_secret", fg = "#e8d4a0",
+            bg="#252626", font = "Times 14 bold" )
+    self.token_label.pack(side=tk.LEFT, padx=(10, 0))
+    self.token_label_entry = tk.Entry(self.pane4, width=35, bd=2,
+            highlightcolor="#1960bd", relief=tk.FLAT, fg="white", bg="#545454")
+    self.token_label_entry.pack(side=tk.LEFT, padx=(40, 0))
+
+
+    self.exit_pane = tk.Frame(self.master, bg="#252626")
+    self.exit_pane.pack(fill=tk.X, side=tk.TOP, anchor=tk.NW, padx=(20, 0), pady=(20, 0))
+
+    self.exit_button = tk.Button(self.exit_pane, fg="white", bg="#3c71ab", text="Exit", command=self.master.destroy
+      ,font="Times 11 bold")
+    self.exit_button.pack(side=tk.LEFT, padx=(20, 0))
+
+    self.login = tk.Button(self.exit_pane, fg="white", bg="#3c71ab", text="Login", font="Times 11 bold",
+      command=lambda:login(self.api_key_entry.get(), 
+                                 self.api_s_entry.get(), 
+                                 self.access_token_entry.get(), 
+                                 self.token_label_entry.get()))
+    self.login.pack(side=tk.RIGHT, padx=(0, 20))   
+
+
+class App():
+  def __init__(self, master, logo, config):
 
     # Main Window
     self.master = master
@@ -15,6 +108,7 @@ class Window():
     self.master.resizable(width=False, height=False)
     self.master.geometry("619x373")
     self.master.configure(bg="white")
+    self.config = config
 
     # Images and Logos 
     self.power = tk.PhotoImage(file = "../image/start_icon.png")
@@ -194,7 +288,7 @@ class Window():
       self.status.configure(state="disabled")
 
   def StartCommand(self):
-    twitter = Twitter(config, self.tweets_entry.get(), self.user_entry.get()
+    twitter = Twitter(self.config, self.tweets_entry.get(), self.user_entry.get()
         , self.radio_var.get(), self.hashtag_entry.get(), self.status.get(1.0, tk.END))
     self.text_box.delete('1.0', tk.END)
 
@@ -232,11 +326,15 @@ class Window():
       self.status_var.set("Status: Tweet Mode Ready")
     else:
       self.status_var.set("Status: Retweet Mode Ready")
-
     for i in range(len(content)):
-      self.text_box.insert(tk.END, content[i] + "\n")
-      self.text_box.tag_configure('left', justify='left')
-      self.text_box.tag_add('left', 1.0, 'end')
+      try:
+        self.text_box.insert(tk.END, content[i] + "\n")
+        self.text_box.tag_configure('left', justify='left')
+        self.text_box.tag_add('left', 1.0, 'end')
+      except:
+        self.text_box.insert(tk.END, "!!! Doesn't support emoji yet, but retweeted" + "\n")
+        self.text_box.tag_configure('left', justify='left')
+        self.text_box.tag_add('left', 1.0, 'end')
 
 
 def main():
@@ -248,9 +346,14 @@ def main():
   logo = logo.zoom(25)
   logo = logo.subsample(51)
 
-  window = Window(root, logo)
-  root.mainloop()
+  try:
+    import config
+    window = App(root, logo, config)
 
+  except ImportError:
+    window = api_window(root)
 
+  root.mainloop() 
+  
 if __name__ == "__main__":
   main()

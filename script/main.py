@@ -2,8 +2,6 @@
 import tkinter as tk
 import tweepy
 import re
-import os
-import sys
 
 
 try:
