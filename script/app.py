@@ -163,8 +163,8 @@ class App():
                                        text="Retweet Except Quote Tweet", 
                                        fg="#ce8cf5", 
                                        variable=self.radio_var, 
-                                       value=1, 
-                                       )
+                                       value=1,
+                                       state=tk.NORMAL)
     self.retweet_only.grid(row=3, column=0, sticky=tk.W)
 
 
@@ -178,7 +178,7 @@ class App():
                               fg="#ce8cf5", 
                               variable=self.radio_var, 
                               value=0, 
-                              )
+                              state=tk.NORMAL)
     self.all.grid(row=4, column=0, sticky=tk.W)
 
 
@@ -237,14 +237,14 @@ class App():
     self.checkbox_value.set(0)
 
     self.checkbox= tk.Checkbutton(self.user_frame, 
-                   text="Tweet Mode", 
+                   text="Quote Tweet Mode", 
                    variable=self.checkbox_value,
                    onvalue=1, offvalue=0, 
                    bg="#252626", 
                    fg="#ce8cf5", 
                    highlightbackground="#252626", 
                    activebackground="#8c8c8c",
-                   # command=self.SelectMode 
+                   command=self.SelectMode 
                    )
     self.checkbox.pack(pady=7)
 
@@ -271,21 +271,16 @@ class App():
         ###### END OF SELF ATTRIBUTES #######
 
 
-  # def SelectMode(self):
-  #   if self.checkbox_value.get() == 1:
-  #     self.user_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-  #     self.tweets_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-  #     self.hashtag_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-  #     self.status_var.set("Status: Tweet Mode Ready")
-  #     self.status.configure(state="normal")
+  def SelectMode(self):
+     if self.checkbox_value.get() == 1:
+       self.retweet_only.config(state=tk.DISABLED) 
+       self.all.config(state=tk.DISABLED)
+       self.status_var.set("Status: Quote Tweet Mode")
+     else:
+       self.retweet_only.configure(state=tk.NORMAL)
+       self.all.config(state=tk.NORMAL)
+       self.status_var.set("Status: Retweet Mode")
 
-
-  #   else:
-  #     self.user_entry.configure(state=tk.NORMAL)
-  #     self.tweets_entry.config(state=tk.NORMAL)
-  #     self.hashtag_entry.config(state=tk.NORMAL)
-  #     self.status_var.set("Status: Retweet Mode Ready")
-  #     self.status.configure(state="disabled")
 
   def StartCommand(self):
     twitter = Twitter(self.config, self.tweets_entry.get(), self.user_entry.get()
