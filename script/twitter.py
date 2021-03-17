@@ -81,8 +81,10 @@ class Twitter():
             print("like tweet")
 
             if tweet.is_quote_status:
-                self.url = "https://twitter.com/" + tweet.quoted_status.user.screen_name + "/status/" + tweet.quoted_status_id_str
-                
+                try:
+                    self.url = "https://twitter.com/" + tweet.quoted_status.user.screen_name + "/status/" + tweet.quoted_status_id_str
+                except:
+                    self.url = "https://twitter.com/" + tweet.retweeted_status.quoted_status.user.screen_name + "/status/" + tweet.retweeted_status.quoted_status.id_str
 
             elif self._is_retweet(tweet):
                 self.url = "https://twitter.com/" + tweet.retweeted_status.user.screen_name + "/status/" + tweet.retweeted_status.id_str
@@ -103,9 +105,9 @@ class Twitter():
             except tweepy.TweepError as e:
                 self.log.append("! Duplicate")
                 print(e.reason)
-
         else:
             self.log.append("! Duplicate")
+            print("already liked")
 
     def like_and_retweet(self):
         try:
