@@ -163,8 +163,8 @@ class App():
                                        text="Retweet Except Quote Tweet", 
                                        fg="#ce8cf5", 
                                        variable=self.radio_var, 
-                                       value=1, 
-                                       )
+                                       value=1,
+                                       state=tk.NORMAL)
     self.retweet_only.grid(row=3, column=0, sticky=tk.W)
 
 
@@ -178,7 +178,7 @@ class App():
                               fg="#ce8cf5", 
                               variable=self.radio_var, 
                               value=0, 
-                              )
+                              state=tk.NORMAL)
     self.all.grid(row=4, column=0, sticky=tk.W)
 
 
@@ -225,7 +225,7 @@ class App():
 
     # Hashtag
     tk.Label(self.user_frame, 
-             text="Specific Hashtag: ", 
+             text="Filter Hashtag: ", 
              bg="#252626", 
              fg="#ce8cf5").pack(padx=10, pady=5)
     self.hashtag_entry = tk.Entry(self.user_frame, fg="white", bg="#545454", highlightcolor="#ce8cf5")
@@ -237,7 +237,7 @@ class App():
     self.checkbox_value.set(0)
 
     self.checkbox= tk.Checkbutton(self.user_frame, 
-                   text="Tweet Mode", 
+                   text="Quote Tweet Mode", 
                    variable=self.checkbox_value,
                    onvalue=1, offvalue=0, 
                    bg="#252626", 
@@ -272,58 +272,51 @@ class App():
 
 
   def SelectMode(self):
-    if self.checkbox_value.get() == 1:
-      self.user_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-      self.tweets_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-      self.hashtag_entry.config(state=tk.DISABLED, disabledbackground='#bfbfbf')
-      self.status_var.set("Status: Tweet Mode Ready")
-      self.status.configure(state="normal")
+     if self.checkbox_value.get() == 1:
+       self.retweet_only.config(state=tk.DISABLED) 
+       self.all.config(state=tk.DISABLED)
+       self.status_var.set("Status: Quote Tweet Mode")
+     else:
+       self.retweet_only.configure(state=tk.NORMAL)
+       self.all.config(state=tk.NORMAL)
+       self.status_var.set("Status: Retweet Mode")
 
-
-    else:
-      self.user_entry.configure(state=tk.NORMAL)
-      self.tweets_entry.config(state=tk.NORMAL)
-      self.hashtag_entry.config(state=tk.NORMAL)
-      self.status_var.set("Status: Retweet Mode Ready")
-      self.status.configure(state="disabled")
 
   def StartCommand(self):
     twitter = Twitter(self.config, self.tweets_entry.get(), self.user_entry.get()
         , self.radio_var.get(), self.hashtag_entry.get(), self.status.get(1.0, tk.END))
     self.text_box.delete('1.0', tk.END)
+    self.text_box.insert(tk.END, "Checking {num} tweets from user {name}.\n\n".
+      format(num=self.tweets_entry.get().replace(' ', ''), name=self.user_entry.get()))
+    self.text_box.tag_configure('left', justify='left')
+    self.text_box.tag_add('left', 1.0, 'end')
 
-    if self.checkbox_value.get() == 1:
-      self.status_var.set("Status: Authenticating User")
-      self.status.update()
+    self.start_var.set("Loading")
+    self.start_b.config(state='disabled', bg="#707070", fg="#D3D3D3")
+    self.start_b.update()
 
-      if twitter.checkAuth():
-        twitter.make_tweet()
-        content = twitter.get_log()
+    self.status_var.set("Status: Authenticating User")
+    self.status.update()
 
-    else:      
-      self.text_box.insert(tk.END, "Checking {num} tweets from user {name}.\n\n".
-        format(num=self.tweets_entry.get().replace(' ', ''), name=self.user_entry.get()))
-      self.text_box.tag_configure('left', justify='left')
-      self.text_box.tag_add('left', 1.0, 'end')
-
-      self.start_var.set("Loading")
-      self.start_b.config(state='disabled', bg="#707070", fg="#D3D3D3")
-      self.start_b.update()
-
-      self.status_var.set("Status: Authenticating User")
-      self.status.update()
-
-      if twitter.checkAuth():
-        self.status_var.set("Status: Retweet in process")
+    if twitter.checkAuth():
+        self.status_var.set("Status: Quote Tweet in process")
         self.status.update()
-        twitter.process_tweet()
-        content=twitter.get_log()
+        if self.checkbox_value.get() == 1:
+            self.status_var.set("Status: Quote Tweet in process")
+            self.status.update()
+            twitter.like_and_quote_tweet()
+            content = twitter.get_log()
+        else:     
+            self.status_var.set("Status: Retweet in process")
+            self.status.update()
+            twitter.like_and_retweet()
+            content=twitter.get_log()
 
     self.start_var.set("Start")
     self.start_b.config(state='normal', bg="#ce8cf5", fg='white')
 
     if self.checkbox_value.get() == 1:
-      self.status_var.set("Status: Tweet Mode Ready")
+      self.status_var.set("Status: Quote Tweet Mode Ready")
     else:
       self.status_var.set("Status: Retweet Mode Ready")
     for i in range(len(content)):
