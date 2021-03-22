@@ -4,6 +4,20 @@ import tweepy
 import re
 import os
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter("%(asctime)s:%(name)s: %(message)s")
+
+file_handler = logging.FileHandler("twitter.log")
+file_handler.setLevel(logging.WARNING)
+file_handler.setFormatter(formatter)
+
+stream_handler = logging.StreamHandler()
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 class Twitter():
@@ -26,10 +40,10 @@ class Twitter():
                          wait_on_rate_limit_notify=True)
 
         if self.api.verify_credentials():
-            print("Valid Credentials")
+            logger.info("Valid Credentials")
             return True
         else:
-            print("Invalid Credentials")
+            logger.info("Invalid Credentials")
             sys.exit(1)
 
     def _is_retweet(self, tweet):
@@ -57,9 +71,9 @@ class Twitter():
         if not tweet.favorited:
             tweet.favorite()
             self.like_counter += 1
-            print("like tweet")
+            logger.info("like tweet")
         else:
-            print("already liked")
+            logger.info("already liked")
 
         if not tweet.retweeted:
             tweet.retweet()
@@ -67,18 +81,18 @@ class Twitter():
             content = content.replace('RT @', '')
             self.log.append(content)
             self.retweet_counter += 1
-            print("retweet")
+            logger.info("retweet")
         else:
             content = "# " +tweet.full_text[4:49].replace('\n', ' ')
             self.log.append(content)
-            print("retweeted post")
+            logger.info("retweeted post")
 
 
     def _quote_tweet(self, tweet):
         if not tweet.favorited:
             tweet.favorite()
             self.like_counter += 1
-            print("like tweet")
+            logger.info("like tweet")
 
             if tweet.is_quote_status:
                 try:
@@ -92,7 +106,7 @@ class Twitter():
             else:
                 self.url = "https://twitter.com/" + self.username + "/status/" + str(tweet.id)
             
-            print(self.url)
+            logger.info(self.url)
             quoted_tweet = self.status + "#WhatsHappeningInMyanmar \n" + self.url
             try:
                 self.api.update_status(quoted_tweet)
@@ -104,16 +118,17 @@ class Twitter():
 
             except tweepy.TweepError as e:
                 self.log.append("! Duplicate")
-                print(e.reason)
+                logger.warning(e.reason)
         else:
             self.log.append("! Duplicate")
-            print("already liked")
+            logger.warning("Duplicate")
 
     def like_and_retweet(self):
         try:
             self.user = self.api.get_user(self.username)
             if not re.match(r"^\d+$", self.tweets_num):
                 self.log.append("Please Enter a valid number of tweets. [1-100]")
+                logger.warning("Invalid number of tweets. [1-100]")
                 return True
             
             self.timeline = self.api.user_timeline(self.username, count=self.tweets_num
@@ -129,7 +144,7 @@ class Twitter():
                     if self._check_hashtag(tweet.full_text):
                         self._like_and_retweet(tweet)
 
-            print("All good. Like {like} tweets; Retweet {retweet} tweets."
+            logger.info("All good. Like {like} tweets; Retweet {retweet} tweets."
                     .format(like=self.like_counter, retweet=self.retweet_counter))
 
             self.log.append(">> Successfully Like {like} tweets; Retweet {retweet} tweets.\n"
@@ -137,6 +152,7 @@ class Twitter():
         
         except tweepy.TweepError as e:
             self.log.append(e.reason)
+            logger.warning(e.reason)
 
 
     def like_and_quote_tweet(self):
@@ -145,6 +161,7 @@ class Twitter():
                 self.user = self.api.get_user(self.username)
                 if not re.match(r"^\d+$", self.tweets_num):
                     self.log.append("Please Enter a valid number of tweets. [1-100]")
+                    logger.warning("Invalid number of tweets. [1-100]")
                     return True
                 
                 self.timeline = self.api.user_timeline(self.username, count=self.tweets_num
@@ -155,7 +172,7 @@ class Twitter():
                     if self._check_hashtag(tweet.full_text):
                         self._quote_tweet(tweet)
 
-                print("All good. Like {like} tweets; Q_Tweet {q_tweet} tweets."
+                logger.info("All good. Like {like} tweets; Q_Tweet {q_tweet} tweets."
                         .format(like=self.like_counter, q_tweet=self.q_tweet_counter))
 
                 self.log.append(">> Successfully Like {like} tweets; Q_Tweet {q_tweet} tweets.\n"
@@ -163,6 +180,7 @@ class Twitter():
             
             except tweepy.TweepError as e:
                 self.log.append(e.reason)
+                logger.warning(e.reason)
 
 
     def get_log(self):

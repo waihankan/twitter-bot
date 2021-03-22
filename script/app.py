@@ -6,6 +6,20 @@ from twitter import Twitter
 import sys
 import os
 import tweepy
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter("%(asctime)s:%(name)s: %(message)s")
+
+file_handler = logging.FileHandler("twitter.log")
+file_handler.setLevel(logging.WARNING)
+file_handler.setFormatter(formatter)
+
+stream_handler = logging.StreamHandler()
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 def login(api_key, api_secret, access_token, token_secret):
@@ -20,13 +34,15 @@ def login(api_key, api_secret, access_token, token_secret):
           api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
           try:
               if api.verify_credentials():
-                print("ok")
+                logger.debug("API OK")
                 sys.exit(0)
               else:
+                logger.error("Bad Authentication Error")
                 os.remove("config.py")
                 
           except tweepy.TweepError as e:
               print(e)
+              logger.error(e.reason)
               os.remove("config.py")        
               
 
@@ -344,6 +360,7 @@ def main():
     window = App(root, logo, config)
 
   except ImportError:
+    logger.warning("API not found. Open api window")
     window = api_window(root)
 
   root.mainloop() 
