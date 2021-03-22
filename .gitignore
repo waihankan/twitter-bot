@@ -4,3 +4,4 @@ config2.py
 tweet_data.txt
 __pycache__
 venv
+*.log
