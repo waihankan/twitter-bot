@@ -69,7 +69,7 @@ class Twitter():
 
     def _like_and_retweet(self, tweet):
         if not tweet.favorited:
-            tweet.favorite()
+            # tweet.favorite()
             self.like_counter += 1
             logger.info("like tweet")
         else:
@@ -90,7 +90,7 @@ class Twitter():
 
     def _quote_tweet(self, tweet):
         if not tweet.favorited:
-            tweet.favorite()
+            # tweet.favorite()
             self.like_counter += 1
             logger.info("like tweet")
 
