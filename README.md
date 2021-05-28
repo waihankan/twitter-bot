@@ -61,7 +61,7 @@
 ## About The Project
 
 This twitter bot is developed for following a specific person/user acouunt and retweet all the tweets of his/her timeline.
-Initial Purpose is the mass trending in twitter about **Myanmar** current problems.
+Initial Purpose was the mass trending in twitter about **Myanmar** current situations.
 However, the project is not super user-friendly yet. I am looking for contributors who can make gui apps, improve code, make new features, fix known issues etc...
 
 ### Built With
@@ -129,10 +129,7 @@ Here is how to use the code as of latest source code.
 
 ## Demo Images
 
-<img align="center" src="image/API_config.png" width = 370 hspace=50> <img align="center" src="image/GUI.png" width=370>
-
-
-
+<img align="center" src="image/demo.png" width = 370> 
 
 <!-- ROADMAP -->
 ## Roadmap
